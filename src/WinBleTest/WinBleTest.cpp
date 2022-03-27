@@ -37,13 +37,17 @@ SOFTWARE.
 using namespace std;
 
 //{49535343-FE7D-4AE5-8FA9-9FAFD205E455}
-static const GUID UUID_SERIAL_SERVICE = { 0x49535343, 0xFE7D, 0x4AE5,{ 0x8F, 0xA9, 0x9F, 0xAF, 0xD2, 0x05, 0xE4, 0x55 } };
+// ·þÎñ
+//static const GUID UUID_SERIAL_SERVICE = { 0x00004321, 0x0000, 0x1000,{ 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB } };
+static const GUID UUID_SERIAL_SERVICE = { 0x00006321, 0x0000, 0x0000,{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
 
 // {49535343-8841-43F4-A8D4-ECBE34729BB3}
-static const GUID UUID_RX_CHARACTERISTIC = { 0x49535343, 0x8841, 0x43F4,{ 0xA8, 0xD4, 0xEC, 0xBE, 0x34, 0x72, 0x9B, 0xB3 } };
+// notify
+static const GUID UUID_RX_CHARACTERISTIC = { 0x0000FFE1, 0x0000, 0x0000,{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
 
 // {49535343-1E4D-4BD9-BA61-23C647249616}
-static const GUID UUID_TX_CHARACTERISTIC = { 0x49535343, 0x1E4D, 0x4BD9,{ 0xBA, 0x61, 0x23, 0xC6, 0x47, 0x24, 0x96, 0x16 } };
+// write
+static const GUID UUID_TX_CHARACTERISTIC = { 0x0000FFE2, 0x0000, 0x0000,{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } };
 
 void HandleCallback(BleGattNotificationData& data)
 {
@@ -153,6 +157,11 @@ void testSerialService(BleDevice::BleGattServices const& services)
 			UCHAR values[] = { 'H', 'I', '\r', '\n' };
 			characteristic->setValue(values, 4);
 
+			auto txit = find_if(begin(characteristics), end(characteristics), [&](unique_ptr<BleGattCharacteristic> const& c)
+				{
+					return c->getCharacteristicUuid().Value.LongUuid == UUID_RX_CHARACTERISTIC;
+				});
+			characteristic = txit->get();
 			const std::function<void(BleGattNotificationData&)> callback = HandleCallback;
 
 			cout << "Enumerating Ble Descriptors" << endl;
@@ -206,8 +215,8 @@ int main()
 		if (BleDeviceEnumerator::getBleDevices().size() >= 1)
 		{
 			cout << "Opening device" << endl;
-
-			auto bleDevice = BleDevice(BleDeviceEnumerator::getBleDevices().front()->getInstanceId());
+			//auto bleDevice = BleDevice(BleDeviceEnumerator::getBleDevices().front()->getInstanceId());
+			auto bleDevice = BleDevice(BleDeviceEnumerator::getBleDevices().back()->getInstanceId());
 
 			bleDevice.enumerateBleServices();
 
